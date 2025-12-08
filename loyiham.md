@@ -69,9 +69,9 @@
 | Reja | Narxi | Imkoniyatlar |
 |------|-------|--------------|
 | **Bepul** | 0 so'm | 1 bot, 100 xabar/oy |
-| **Starter** | 165,000 so'm/oy | 3 bot, 1,000 xabar |
-| **Basic** | 290,000 so'm/oy | 10 bot, 10,000 xabar |
-| **Premium** | 590,000 so'm/oy | 50 bot, 100,000 xabar |
+| **Starter** | 165,000 so'm/oy | 1 bot, 1,000 xabar |
+| **Basic** | 290,000 so'm/oy | 2 bot, 10,000 xabar |
+| **Premium** | 590,000 so'm/oy | 3 bot, 100,000 xabar |
 
 ### To'lov qanday qilish?
 
