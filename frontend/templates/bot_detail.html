@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}{{ bot.name }} - BotFactory AI{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Page Header -->
+    <div class="flex justify-between items-center" style="margin-bottom: 2rem;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <a href="/bots" class="btn btn-secondary btn-sm">← Orqaga</a>
+                <h1 style="margin: 0;">{{ bot.name }}</h1>
+                <span class="badge {% if bot.is_active %}badge-success{% else %}badge-warning{% endif %}">
+                    {{ 'Faol' if bot.is_active else 'Nofaol' }}
+                </span>
+            </div>
+            <p style="margin: 0.5rem 0 0 0;">Bot sozlamalari va konfiguratsiyasi</p>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+            <a href="/bots/{{ bot.id }}/knowledge" class="btn btn-secondary">📚 Bilimlar</a>
+            {% if bot.is_active %}
+            <button class="btn btn-danger">O'chirish</button>
+            {% else %}
+            <button class="btn btn-success">Yoqish</button>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="grid grid-cols-3 gap-6">
+        <!-- Main Settings -->
+        <div style="grid-column: span 2;">
+            <div class="card">
+                <h3 style="margin-bottom: 1.5rem;">Asosiy sozlamalar</h3>
+
+                <form id="botSettingsForm">
+                    <div class="form-group">
+                        <label class="form-label">Bot nomi</label>
+                        <input type="text" name="name" class="form-input" value="{{ bot.name }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Tavsif</label>
+                        <textarea name="description" class="form-input" rows="2">{{ bot.description or '' }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Bot token</label>
+                        <input type="text" name="token" class="form-input" value="{{ bot.token }}"
+                            placeholder="Telegram bot token">
+                        <small style="color: var(--text-muted);">@BotFather dan olingan token</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Salomlash xabari</label>
+                        <textarea name="welcome_message" class="form-input"
+                            rows="3">{{ bot.welcome_message or 'Salom! Men sizga qanday yordam bera olaman?' }}</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">AI prompt (ko'rsatma)</label>
+                        <textarea name="ai_prompt" class="form-input" rows="4">{{ bot.ai_prompt or '' }}</textarea>
+                        <small style="color: var(--text-muted);">Bot qanday javob berishini belgilaydi</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Saqlash</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div>
+            <!-- Bot Info Card -->
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <h4 style="margin-bottom: 1rem;">Bot ma'lumotlari</h4>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">Platforma</span>
+                        <span>📱 {{ bot.platform.value | title }}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">Holat</span>
+                        <span class="badge {% if bot.is_active %}badge-success{% else %}badge-warning{% endif %}">
+                            {{ 'Faol' if bot.is_active else 'Nofaol' }}
+                        </span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">Bot ID</span>
+                        <span>#{{ bot.id }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <h4 style="margin-bottom: 1rem;">Statistika</h4>
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">Jami xabarlar</span>
+                        <span style="font-weight: 600;">1,542</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">Foydalanuvchilar</span>
+                        <span style="font-weight: 600;">128</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span style="color: var(--text-muted);">Bilimlar</span>
+                        <span style="font-weight: 600;">45</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Danger Zone -->
+            <div class="card" style="border-color: var(--danger);">
+                <h4 style="margin-bottom: 1rem; color: var(--danger);">⚠️ Xavfli zona</h4>
+                <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1rem;">
+                    Botni o'chirsangiz, barcha ma'lumotlar yo'qoladi!
+                </p>
+                <button class="btn btn-danger" style="width: 100%;">Botni o'chirish</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    document.getElementById('botSettingsForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData);
+
+        const result = await api.patch('/bots/{{ bot.id }}', data);
+
+        if (result.ok) {
+            UI.showAlert('Sozlamalar saqlandi!', 'success');
+        } else {
+            UI.showAlert(result.data?.detail || 'Xatolik yuz berdi', 'danger');
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}

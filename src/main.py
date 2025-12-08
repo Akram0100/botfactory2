@@ -253,6 +253,54 @@ async def bots_page(request: Request):
     })
 
 
+@app.get("/bots/{bot_id}", response_class=HTMLResponse, tags=["Pages"])
+async def bot_detail_page(request: Request, bot_id: int):
+    """Bot detail/settings page."""
+    mock_user = {
+        "username": "demo_user",
+        "subscription_type": type("obj", (object,), {"value": "starter"})(),
+    }
+    
+    mock_bot = {
+        "id": bot_id,
+        "name": "Savdo yordamchisi",
+        "description": "Mijozlarga mahsulotlar haqida ma'lumot beradi",
+        "platform": type("obj", (object,), {"value": "telegram"})(),
+        "is_active": True,
+        "token": "123456:ABC...",
+        "welcome_message": "Salom! Men sizga qanday yordam bera olaman?",
+        "ai_prompt": "Siz do'kon yordamchisisiz...",
+    }
+    
+    return templates.TemplateResponse("bot_detail.html", {
+        "request": request,
+        "user": mock_user,
+        "bot": mock_bot,
+        "active_page": "bots",
+    })
+
+
+@app.get("/bots/{bot_id}/knowledge", response_class=HTMLResponse, tags=["Pages"])
+async def bot_knowledge_page(request: Request, bot_id: int):
+    """Bot knowledge base page."""
+    mock_user = {
+        "username": "demo_user",
+        "subscription_type": type("obj", (object,), {"value": "starter"})(),
+    }
+    
+    mock_bot = {"id": bot_id, "name": "Savdo yordamchisi"}
+    
+    return templates.TemplateResponse("knowledge.html", {
+        "request": request,
+        "user": mock_user,
+        "bots": [mock_bot],
+        "stats": {"total": 45, "faq": 20, "products": 15, "texts": 10},
+        "knowledge_items": [],
+        "active_page": "knowledge",
+    })
+
+
+
 @app.get("/knowledge", response_class=HTMLResponse, tags=["Pages"])
 async def knowledge_page(request: Request):
     """Knowledge base management page."""
