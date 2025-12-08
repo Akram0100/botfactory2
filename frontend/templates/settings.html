@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}Sozlamalar - BotFactory AI{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 style="margin-bottom: 2rem;">Sozlamalar</h1>
+
+    <div class="grid grid-cols-3 gap-6">
+        <!-- Profile Settings -->
+        <div class="card" style="grid-column: span 2;">
+            <div class="card-header">
+                <h3 class="card-title">Profil sozlamalari</h3>
+            </div>
+            <form id="profileForm">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label class="form-label">Foydalanuvchi nomi</label>
+                        <input type="text" name="username" class="form-input" value="{{ user.username }}" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" class="form-input" value="{{ user.email }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">To'liq ism</label>
+                        <input type="text" name="full_name" class="form-input" value="{{ user.full_name or '' }}"
+                            placeholder="Ism Familiya">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Telefon</label>
+                        <input type="tel" name="phone" class="form-input" value="{{ user.phone or '' }}"
+                            placeholder="+998 90 123 45 67">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Saqlash</button>
+            </form>
+        </div>
+
+        <!-- Subscription Info -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Obuna</h3>
+            </div>
+            <div style="text-align: center; padding: 1rem 0;">
+                <div class="badge {% if user.subscription_type.value != 'free' %}badge-success{% else %}badge-warning{% endif %}"
+                    style="font-size: 1rem; padding: 0.5rem 1rem;">
+                    {{ user.subscription_type.value | upper }}
+                </div>
+                {% if user.subscription_expires_at %}
+                <p style="margin-top: 1rem; color: var(--text-muted);">
+                    Amal qilish: {{ user.subscription_expires_at }}
+                </p>
+                {% endif %}
+            </div>
+            <a href="/pricing" class="btn btn-secondary" style="width: 100%;">Obunani yangilash</a>
+        </div>
+
+        <!-- Password Change -->
+        <div class="card" style="grid-column: span 2;">
+            <div class="card-header">
+                <h3 class="card-title">Parolni o'zgartirish</h3>
+            </div>
+            <form id="passwordForm">
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label class="form-label">Joriy parol</label>
+                        <input type="password" name="current_password" class="form-input" placeholder="••••••••"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Yangi parol</label>
+                        <input type="password" name="new_password" class="form-input" placeholder="••••••••"
+                            minlength="8" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Parolni tasdiqlash</label>
+                        <input type="password" name="confirm_password" class="form-input" placeholder="••••••••"
+                            required>
+                    </div>
+                </div>
+                <div id="passwordError" class="alert alert-danger" style="display: none;"></div>
+                <button type="submit" class="btn btn-primary">Parolni o'zgartirish</button>
+            </form>
+        </div>
+
+        <!-- Notifications -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Bildirishnomalar</h3>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;">
+                    <input type="checkbox" checked> Email xabarnomalar
+                </label>
+                <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;">
+                    <input type="checkbox" checked> Telegram xabarnomalar
+                </label>
+                <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;">
+                    <input type="checkbox"> Marketing xabarlari
+                </label>
+            </div>
+        </div>
+
+        <!-- API Keys -->
+        <div class="card" style="grid-column: span 3;">
+            <div class="card-header">
+                <h3 class="card-title">API kalitlari</h3>
+                <button class="btn btn-secondary btn-sm" onclick="generateApiKey()">Yangi kalit yaratish</button>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nomi</th>
+                            <th>Kalit</th>
+                            <th>Yaratilgan</th>
+                            <th>Amallar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Default API Key</td>
+                            <td><code
+                                    style="background: var(--bg-darker); padding: 0.25rem 0.5rem; border-radius: 4px;">bf_sk_****...****</code>
+                            </td>
+                            <td style="color: var(--text-muted);">2024-01-15</td>
+                            <td>
+                                <button class="btn btn-secondary btn-sm">Ko'rsatish</button>
+                                <button class="btn btn-danger btn-sm">O'chirish</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Danger Zone -->
+        <div class="card" style="grid-column: span 3; border-color: var(--danger);">
+            <div class="card-header">
+                <h3 class="card-title" style="color: var(--danger);">Xavfli zona</h3>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <strong>Hisobni o'chirish</strong>
+                    <p style="margin: 0; color: var(--text-muted); font-size: 0.875rem;">
+                        Bu amalni qaytarib bo'lmaydi. Barcha ma'lumotlaringiz o'chiriladi.
+                    </p>
+                </div>
+                <button class="btn btn-danger" onclick="deleteAccount()">Hisobni o'chirish</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    document.getElementById('profileForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const result = await api.patch('/auth/profile', Object.fromEntries(formData));
+
+        if (result.ok) {
+            UI.showAlert('Profil yangilandi!', 'success');
+        } else {
+            UI.showAlert(result.data?.detail || 'Xatolik', 'danger');
+        }
+    });
+
+    document.getElementById('passwordForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData);
+
+        if (data.new_password !== data.confirm_password) {
+            document.getElementById('passwordError').textContent = 'Parollar mos kelmaydi';
+            document.getElementById('passwordError').style.display = 'block';
+            return;
+        }
+
+        const result = await api.post('/auth/change-password', {
+            current_password: data.current_password,
+            new_password: data.new_password
+        });
+
+        if (result.ok) {
+            UI.showAlert('Parol o\'zgartirildi!', 'success');
+            e.target.reset();
+        } else {
+            document.getElementById('passwordError').textContent = result.data?.detail || 'Xatolik';
+            document.getElementById('passwordError').style.display = 'block';
+        }
+    });
+
+    function deleteAccount() {
+        if (confirm('Hisobingizni o\'chirmoqchimisiz? Bu amalni qaytarib bo\'lmaydi!')) {
+            // TODO: Implement account deletion
+            UI.showAlert('Hisob o\'chirildi', 'success');
+        }
+    }
+</script>
+{% endblock %}
+{% endblock %}

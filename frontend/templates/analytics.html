@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+
+{% block title %}Analitika - BotFactory AI{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Page Header -->
+    <div class="flex justify-between items-center" style="margin-bottom: 2rem;">
+        <div>
+            <h1>Analitika</h1>
+            <p style="margin: 0;">Botlaringiz faoliyatini kuzating</p>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+            <select id="periodSelector" class="form-input" style="width: auto;">
+                <option value="7">Oxirgi 7 kun</option>
+                <option value="30" selected>Oxirgi 30 kun</option>
+                <option value="90">Oxirgi 90 kun</option>
+            </select>
+            <select id="botSelector" class="form-input" style="width: auto;">
+                <option value="">Barcha botlar</option>
+                {% for bot in bots %}
+                <option value="{{ bot.id }}">{{ bot.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <!-- Main Stats -->
+    <div class="stats-grid" style="margin-bottom: 2rem;">
+        <div class="stat-card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div class="stat-value">{{ stats.total_messages | default('2,458') }}</div>
+                    <div class="stat-label">Jami xabarlar</div>
+                </div>
+                <span style="color: var(--accent);">+12%</span>
+            </div>
+        </div>
+        <div class="stat-card accent">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div class="stat-value">{{ stats.total_users | default('342') }}</div>
+                    <div class="stat-label">Foydalanuvchilar</div>
+                </div>
+                <span style="color: var(--accent);">+8%</span>
+            </div>
+        </div>
+        <div class="stat-card secondary">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div class="stat-value">{{ stats.avg_response_time | default('1.2s') }}</div>
+                    <div class="stat-label">O'rtacha javob vaqti</div>
+                </div>
+                <span style="color: var(--accent);">-5%</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <div class="stat-value">{{ stats.satisfaction | default('94%') }}</div>
+                    <div class="stat-label">Qoniqish darajasi</div>
+                </div>
+                <span style="color: var(--accent);">+2%</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-6">
+        <!-- Messages Chart -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Xabarlar dinamikasi</h3>
+            </div>
+            <div
+                style="height: 250px; display: flex; align-items: flex-end; justify-content: space-around; padding: 1rem;">
+                {% for i in range(14) %}
+                <div
+                    style="width: 20px; background: var(--gradient-primary); border-radius: 4px 4px 0 0; height: {{ [40, 55, 45, 70, 65, 85, 80, 90, 75, 95, 88, 78, 92, 85][i] }}%;">
+                </div>
+                {% endfor %}
+            </div>
+            <div
+                style="display: flex; justify-content: space-between; padding: 0 1rem; color: var(--text-muted); font-size: 0.75rem;">
+                <span>2 hafta oldin</span>
+                <span>Bugun</span>
+            </div>
+        </div>
+
+        <!-- Users Chart -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Yangi foydalanuvchilar</h3>
+            </div>
+            <div
+                style="height: 250px; display: flex; align-items: flex-end; justify-content: space-around; padding: 1rem;">
+                {% for i in range(14) %}
+                <div
+                    style="width: 20px; background: var(--gradient-accent); border-radius: 4px 4px 0 0; height: {{ [30, 45, 35, 60, 55, 75, 70, 80, 65, 85, 78, 68, 82, 75][i] }}%;">
+                </div>
+                {% endfor %}
+            </div>
+            <div
+                style="display: flex; justify-content: space-between; padding: 0 1rem; color: var(--text-muted); font-size: 0.75rem;">
+                <span>2 hafta oldin</span>
+                <span>Bugun</span>
+            </div>
+        </div>
+
+        <!-- Top Questions -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Eng ko'p so'ralgan savollar</h3>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                {% for q in [
+                {'text': 'Mahsulot narxi qancha?', 'count': 156},
+                {'text': 'Yetkazib berish bor', 'count': 134},
+                {'text': 'Qanday tolov qilaman?', 'count': 98},
+                {'text': 'Qaytarish siyosati', 'count': 87},
+                {'text': 'Ish vaqtlari', 'count': 72}
+                ] %}
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="color: var(--text-secondary);">{{ q.text }}</span>
+                    <span class="badge badge-success">{{ q.count }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Bot Performance -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Bot samaradorligi</h3>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                {% for bot in [
+                {'name': 'Savdo yordamchisi', 'messages': 1542, 'percent': 85},
+                {'name': 'FAQ Bot', 'messages': 856, 'percent': 72},
+                {'name': 'Qollanma Bot', 'messages': 234, 'percent': 45}
+                ] %}
+                <div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>{{ bot.name }}</span>
+                        <span style="color: var(--text-muted);">{{ bot.messages }} xabar</span>
+                    </div>
+                    <div style="height: 8px; background: var(--bg-darker); border-radius: 4px; overflow: hidden;">
+                        <div
+                            style="height: 100%; width: {{ bot.percent }}%; background: var(--gradient-primary); border-radius: 4px;">
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="card" style="margin-top: 2rem;">
+        <div class="card-header">
+            <h3 class="card-title">So'nggi faoliyat</h3>
+        </div>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Vaqt</th>
+                        <th>Bot</th>
+                        <th>Foydalanuvchi</th>
+                        <th>Xabar</th>
+                        <th>Javob vaqti</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for activity in [
+                    {'time': '2 daqiqa oldin', 'bot': 'Savdo yordamchisi', 'user': '@user123', 'message': 'Narxlar
+                    qancha?', 'response': '0.8s'},
+                    {'time': '5 daqiqa oldin', 'bot': 'FAQ Bot', 'user': '@client456', 'message': 'Yetkazib berish
+                    bormi?', 'response': '1.2s'},
+                    {'time': '12 daqiqa oldin', 'bot': 'Savdo yordamchisi', 'user': '@buyer789', 'message': 'Bu mahsulot
+                    bormi?', 'response': '0.9s'}
+                    ] %}
+                    <tr>
+                        <td style="color: var(--text-muted);">{{ activity.time }}</td>
+                        <td>{{ activity.bot }}</td>
+                        <td><code>{{ activity.user }}</code></td>
+                        <td>{{ activity.message }}</td>
+                        <td><span class="badge badge-success">{{ activity.response }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

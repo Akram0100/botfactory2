@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="BotFactory AI - O'zbek tilidagi AI chatbot yaratish platformasi">
+    <title>{% block title %}BotFactory AI{% endblock %}</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="/static/css/style.css">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container navbar-content">
+            <a href="/" class="navbar-brand">
+                <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="32" height="32" rx="8" fill="url(#logo-gradient)"/>
+                    <path d="M8 12C8 10.8954 8.89543 10 10 10H22C23.1046 10 24 10.8954 24 12V20C24 21.1046 23.1046 22 22 22H10C8.89543 22 8 21.1046 8 20V12Z" fill="white" fill-opacity="0.9"/>
+                    <circle cx="12" cy="15" r="1.5" fill="#6366f1"/>
+                    <circle cx="20" cy="15" r="1.5" fill="#6366f1"/>
+                    <path d="M13 18.5C13 18.5 14.5 20 16 20C17.5 20 19 18.5 19 18.5" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round"/>
+                    <defs>
+                        <linearGradient id="logo-gradient" x1="0" y1="0" x2="32" y2="32">
+                            <stop stop-color="#6366f1"/>
+                            <stop offset="1" stop-color="#8b5cf6"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+                BotFactory AI
+            </a>
+            
+            <ul class="navbar-nav">
+                {% if user %}
+                <li><a href="/dashboard" class="nav-link">Dashboard</a></li>
+                <li><a href="/bots" class="nav-link">Botlarim</a></li>
+                <li><a href="/pricing" class="nav-link">Narxlar</a></li>
+                <li>
+                    <a href="/profile" class="btn btn-secondary btn-sm">
+                        {{ user.username }}
+                    </a>
+                </li>
+                {% else %}
+                <li><a href="/pricing" class="nav-link">Narxlar</a></li>
+                <li><a href="/docs" class="nav-link">Hujjatlar</a></li>
+                <li><a href="/login" class="btn btn-secondary btn-sm">Kirish</a></li>
+                <li><a href="/register" class="btn btn-primary btn-sm">Ro'yxatdan o'tish</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    {% if user %}
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <nav>
+            <ul class="sidebar-nav">
+                <li>
+                    <a href="/dashboard" class="sidebar-link {% if active_page == 'dashboard' %}active{% endif %}">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                        </svg>
+                        Bosh sahifa
+                    </a>
+                </li>
+                <li>
+                    <a href="/bots" class="sidebar-link {% if active_page == 'bots' %}active{% endif %}">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                        Botlarim
+                    </a>
+                </li>
+                <li>
+                    <a href="/knowledge" class="sidebar-link {% if active_page == 'knowledge' %}active{% endif %}">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                        </svg>
+                        Bilimlar bazasi
+                    </a>
+                </li>
+                <li>
+                    <a href="/analytics" class="sidebar-link {% if active_page == 'analytics' %}active{% endif %}">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                        Analitika
+                    </a>
+                </li>
+                <li>
+                    <a href="/payments" class="sidebar-link {% if active_page == 'payments' %}active{% endif %}">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                        </svg>
+                        To'lovlar
+                    </a>
+                </li>
+                <li>
+                    <a href="/settings" class="sidebar-link {% if active_page == 'settings' %}active{% endif %}">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        Sozlamalar
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="{% if user %}main-content{% endif %}">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Scripts -->
+    <script src="/static/js/app.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

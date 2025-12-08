@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: botfactory-api
+    runtime: python
+    region: frankfurt
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn src.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: DEBUG
+        value: "false"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false
+      - key: PAYME_MERCHANT_ID
+        sync: false
+      - key: PAYME_SECRET_KEY
+        sync: false
+      - key: CLICK_MERCHANT_ID
+        sync: false
+      - key: CLICK_SERVICE_ID
+        sync: false
+      - key: CLICK_SECRET_KEY
+        sync: false

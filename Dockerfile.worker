@@ -1,0 +1,29 @@
+# ============================================
+# BotFactory AI - Celery Worker Dockerfile
+# ============================================
+
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install poetry
+RUN pip install poetry==1.7.1
+
+# Copy dependency files
+COPY pyproject.toml poetry.lock* ./
+
+# Install dependencies
+RUN poetry config virtualenvs.create false \
+    && poetry install --no-dev --no-interaction --no-ansi
+
+# Copy application code
+COPY src/ ./src/
+
+# Create non-root user
+RUN groupadd -r celery && useradd -r -g celery celery
+RUN chown -R celery:celery /app
+
+USER celery
+
+# Default command (can be overridden)
+CMD ["celery", "-A", "src.tasks.celery_app", "worker", "-l", "info"]

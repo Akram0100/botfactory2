@@ -1,0 +1,198 @@
+{% extends "base.html" %}
+
+{% block title %}Narxlar - BotFactory AI{% endblock %}
+
+{% block content %}
+<div style="padding-top: 80px;">
+    <div class="container">
+        <!-- Header -->
+        <div style="text-align: center; margin-bottom: 4rem;">
+            <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">Sizga mos rejani tanlang</h1>
+            <p style="color: var(--text-secondary); font-size: 1.125rem; max-width: 600px; margin: 0 auto;">
+                Bepul boshlang va biznesingiz o'sganda obunangizni yangilang
+            </p>
+        </div>
+
+        <!-- Pricing Cards -->
+        <div class="grid grid-cols-4 gap-6" style="margin-bottom: 4rem;">
+            <!-- Free -->
+            <div class="card" style="text-align: center;">
+                <div style="padding: 1rem 0;">
+                    <h3
+                        style="color: var(--text-muted); font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.1em;">
+                        Bepul</h3>
+                    <div style="margin: 1rem 0;">
+                        <span style="font-size: 3rem; font-weight: 700;">0</span>
+                        <span style="color: var(--text-muted);">so'm/oy</span>
+                    </div>
+                </div>
+                <ul style="list-style: none; text-align: left; margin: 1.5rem 0; color: var(--text-secondary);">
+                    <li style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="color: var(--accent);">✓</span> 1 ta bot
+                    </li>
+                    <li style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="color: var(--accent);">✓</span> 100 ta xabar/oy
+                    </li>
+                    <li style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="color: var(--accent);">✓</span> Telegram
+                    </li>
+                    <li style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="color: var(--accent);">✓</span> Asosiy AI
+                    </li>
+                </ul>
+                <a href="/register" class="btn btn-secondary" style="width: 100%;">Boshlash</a>
+            </div>
+
+            <!-- Starter -->
+            <div class="card" style="text-align: center;">
+                <div style="padding: 1rem 0;">
+                    <h3
+                        style="color: var(--secondary); font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.1em;">
+                        Starter</h3>
+                    <div style="margin: 1rem 0;">
+                        <span style="font-size: 3rem; font-weight: 700;">165,000</span>
+                        <span style="color: var(--text-muted);">so'm/oy</span>
+                    </div>
+                </div>
+                <ul style="list-style: none; text-align: left; margin: 1.5rem 0; color: var(--text-secondary);">
+                    <li style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="color: var(--accent);">✓</span> 3 ta bot
+                    </li>
+                    <li style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="color: var(--accent);">✓</span> 1,000 ta xabar/oy
+                    </li>
+                    <li style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="color: var(--accent);">✓</span> Telegram + WhatsApp
+                    </li>
+                    <li style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="color: var(--accent);">✓</span> Bilimlar bazasi
+                    </li>
+                    <li style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="color: var(--accent);">✓</span> Email qo'llab-quvvatlash
+                    </li>
+                </ul>
+                <a href="/register" class="btn btn-secondary" style="width: 100%;">Tanlash</a>
+            </div>
+
+            <!-- Basic - Popular -->
+            <div class="card" style="text-align: center; border-color: var(--primary); position: relative;">
+                <div
+                    style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--gradient-primary); padding: 0.25rem 1rem; border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 600;">
+                    MASHHUR
+                </div>
+                <div style="padding: 1rem 0;">
+                    <h3
+                        style="color: var(--primary-light); font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.1em;">
+                        Basic</h3>
+                    <div style="margin: 1rem 0;">
+                        <span style="font-size: 3rem; font-weight: 700;">290,000</span>
+                        <span style="color: var(--text-muted);">so'm/oy</span>
+                    </div>
+                </div>
+                <ul style="list-style: none; text-align: left; margin: 1.5rem 0; color: var(--text-secondary);">
+                    <li style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="color: var(--accent);">✓</span> 10 ta bot
+                    </li>
+                    <li style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="color: var(--accent);">✓</span> 10,000 ta xabar/oy
+                    </li>
+                    <li style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="color: var(--accent);">✓</span> Barcha platformalar
+                    </li>
+                    <li style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="color: var(--accent);">✓</span> Bilimlar + FAQ
+                    </li>
+                    <li style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="color: var(--accent);">✓</span> Tezkor qo'llab-quvvatlash
+                    </li>
+                    <li style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="color: var(--accent);">✓</span> Analitika
+                    </li>
+                </ul>
+                <a href="/register" class="btn btn-primary" style="width: 100%;">Tanlash</a>
+            </div>
+
+            <!-- Premium -->
+            <div class="card" style="text-align: center;">
+                <div style="padding: 1rem 0;">
+                    <h3
+                        style="color: var(--warning); font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.1em;">
+                        Premium</h3>
+                    <div style="margin: 1rem 0;">
+                        <span style="font-size: 3rem; font-weight: 700;">590,000</span>
+                        <span style="color: var(--text-muted);">so'm/oy</span>
+                    </div>
+                </div>
+                <ul style="list-style: none; text-align: left; margin: 1.5rem 0; color: var(--text-secondary);">
+                    <li style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="color: var(--accent);">✓</span> 50 ta bot
+                    </li>
+                    <li style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="color: var(--accent);">✓</span> 100,000 ta xabar/oy
+                    </li>
+                    <li style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="color: var(--accent);">✓</span> Barcha platformalar
+                    </li>
+                    <li style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="color: var(--accent);">✓</span> Shaxsiy AI sozlamalari
+                    </li>
+                    <li style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="color: var(--accent);">✓</span> Prioritet qo'llab-quvvatlash
+                    </li>
+                    <li style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="color: var(--accent);">✓</span> API kirish
+                    </li>
+                    <li style="padding: 0.5rem 0; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="color: var(--accent);">✓</span> Custom branding
+                    </li>
+                </ul>
+                <a href="/register" class="btn btn-secondary" style="width: 100%;">Tanlash</a>
+            </div>
+        </div>
+
+        <!-- Payment Methods -->
+        <div style="text-align: center; padding: 2rem 0;">
+            <p style="color: var(--text-muted); margin-bottom: 1rem;">To'lov usullari:</p>
+            <div style="display: flex; justify-content: center; gap: 2rem; opacity: 0.7;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="font-size: 1.5rem;">💳</span> PayMe
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="font-size: 1.5rem;">💳</span> Click
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="font-size: 1.5rem;">💳</span> Uzum
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ -->
+        <div style="max-width: 800px; margin: 4rem auto;">
+            <h2 style="text-align: center; margin-bottom: 2rem;">Ko'p so'raladigan savollar</h2>
+
+            <div class="card" style="margin-bottom: 1rem;">
+                <h4 style="margin-bottom: 0.5rem;">Bepul rejada nimalar bor?</h4>
+                <p style="margin: 0; color: var(--text-secondary);">
+                    Bepul rejada 1 ta Telegram bot yaratishingiz va oyiga 100 ta xabarga javob berishingiz mumkin.
+                    Bu kichik loyihalar va sinov uchun juda mos.
+                </p>
+            </div>
+
+            <div class="card" style="margin-bottom: 1rem;">
+                <h4 style="margin-bottom: 0.5rem;">Obunani bekor qilsam bo'ladimi?</h4>
+                <p style="margin: 0; color: var(--text-secondary);">
+                    Ha, istalgan vaqtda bekor qilishingiz mumkin. Obuna davri tugaguncha xizmatdan foydalanishingiz
+                    mumkin.
+                </p>
+            </div>
+
+            <div class="card" style="margin-bottom: 1rem;">
+                <h4 style="margin-bottom: 0.5rem;">Qanday to'lash mumkin?</h4>
+                <p style="margin: 0; color: var(--text-secondary);">
+                    PayMe, Click va Uzum orqali to'lashingiz mumkin. To'lov avtomatik tarzda qayta ishlanadi.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

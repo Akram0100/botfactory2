@@ -1,0 +1,268 @@
+{% extends "base.html" %}
+
+{% block title %}Bilimlar bazasi - BotFactory AI{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Page Header -->
+    <div class="flex justify-between items-center" style="margin-bottom: 2rem;">
+        <div>
+            <h1>Bilimlar bazasi</h1>
+            <p style="margin: 0;">Botingizni o'rgatish uchun ma'lumotlar qo'shing</p>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+            <select id="botSelector" class="form-input" style="width: auto;">
+                {% for bot in bots %}
+                <option value="{{ bot.id }}">{{ bot.name }}</option>
+                {% endfor %}
+            </select>
+            <button onclick="UI.showModal('addKnowledgeModal')" class="btn btn-primary">
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Qo'shish
+            </button>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid" style="margin-bottom: 2rem;">
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.total }}</div>
+            <div class="stat-label">Jami yozuvlar</div>
+        </div>
+        <div class="stat-card accent">
+            <div class="stat-value">{{ stats.faq }}</div>
+            <div class="stat-label">FAQ</div>
+        </div>
+        <div class="stat-card secondary">
+            <div class="stat-value">{{ stats.products }}</div>
+            <div class="stat-label">Mahsulotlar</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ stats.texts }}</div>
+            <div class="stat-label">Matnlar</div>
+        </div>
+    </div>
+
+    <!-- Knowledge Items -->
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Barcha ma'lumotlar</h3>
+            <div style="display: flex; gap: 0.5rem;">
+                <input type="search" id="searchInput" class="form-input" placeholder="Qidirish..."
+                    style="width: 200px;">
+                <select id="typeFilter" class="form-input" style="width: auto;">
+                    <option value="">Barchasi</option>
+                    <option value="faq">FAQ</option>
+                    <option value="text">Matn</option>
+                    <option value="product">Mahsulot</option>
+                </select>
+            </div>
+        </div>
+
+        {% if knowledge_items %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Turi</th>
+                        <th>Sarlavha</th>
+                        <th>Holat</th>
+                        <th>Yaratilgan</th>
+                        <th>Amallar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in knowledge_items %}
+                    <tr>
+                        <td>
+                            <span
+                                class="badge {% if item.source_type == 'faq' %}badge-success{% elif item.source_type == 'product' %}badge-warning{% else %}badge-info{% endif %}">
+                                {{ item.source_type | upper }}
+                            </span>
+                        </td>
+                        <td>
+                            <strong>{{ item.title }}</strong>
+                            {% if item.question %}
+                            <br><small style="color: var(--text-muted);">{{ item.question[:50] }}...</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge {% if item.is_active %}badge-success{% else %}badge-warning{% endif %}">
+                                {{ 'Faol' if item.is_active else 'Nofaol' }}
+                            </span>
+                        </td>
+                        <td style="color: var(--text-muted);">{{ item.created_at }}</td>
+                        <td>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button onclick="editItem({{ item.id }})" class="btn btn-secondary btn-sm">✏️</button>
+                                <button onclick="deleteItem({{ item.id }})" class="btn btn-danger btn-sm">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+            </svg>
+            <h3>Bilimlar bazasi bo'sh</h3>
+            <p>Botingiz savollarga to'g'ri javob berishi uchun ma'lumot qo'shing!</p>
+            <button onclick="UI.showModal('addKnowledgeModal')" class="btn btn-primary">Ma'lumot qo'shish</button>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Add Knowledge Modal -->
+<div class="modal-overlay" id="addKnowledgeModal">
+    <div class="modal" style="max-width: 600px;">
+        <div class="modal-header">
+            <h3 class="modal-title">Bilimlar bazasiga qo'shish</h3>
+            <button class="modal-close" onclick="UI.hideModal('addKnowledgeModal')">✕</button>
+        </div>
+        <form id="addKnowledgeForm">
+            <div class="modal-body">
+                <!-- Type Selector -->
+                <div class="form-group">
+                    <label class="form-label">Turi *</label>
+                    <div style="display: flex; gap: 1rem;">
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                            <input type="radio" name="source_type" value="faq" checked
+                                onchange="toggleKnowledgeFields()">
+                            <span>FAQ</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                            <input type="radio" name="source_type" value="text" onchange="toggleKnowledgeFields()">
+                            <span>Matn</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                            <input type="radio" name="source_type" value="product" onchange="toggleKnowledgeFields()">
+                            <span>Mahsulot</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Sarlavha *</label>
+                    <input type="text" name="title" class="form-input" placeholder="Sarlavha" required>
+                </div>
+
+                <!-- FAQ Fields -->
+                <div id="faqFields">
+                    <div class="form-group">
+                        <label class="form-label">Savol *</label>
+                        <input type="text" name="question" class="form-input"
+                            placeholder="Mijozlar ko'p so'raydigan savol">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Javob *</label>
+                        <textarea name="answer" class="form-input" rows="4" placeholder="Savolga javob"></textarea>
+                    </div>
+                </div>
+
+                <!-- Text Fields -->
+                <div id="textFields" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">Matn *</label>
+                        <textarea name="content" class="form-input" rows="6"
+                            placeholder="Bot o'rganishi kerak bo'lgan ma'lumot..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Product Fields -->
+                <div id="productFields" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">Mahsulot tavsifi *</label>
+                        <textarea name="product_content" class="form-input" rows="3"
+                            placeholder="Mahsulot haqida ma'lumot"></textarea>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Narxi (so'm)</label>
+                            <input type="number" name="price" class="form-input" placeholder="100000">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">SKU</label>
+                            <input type="text" name="sku" class="form-input" placeholder="PRD-001">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="addKnowledgeError" class="alert alert-danger" style="display: none;"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="UI.hideModal('addKnowledgeModal')">Bekor
+                    qilish</button>
+                <button type="submit" class="btn btn-primary">Qo'shish</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    function toggleKnowledgeFields() {
+        const type = document.querySelector('input[name="source_type"]:checked').value;
+        document.getElementById('faqFields').style.display = type === 'faq' ? 'block' : 'none';
+        document.getElementById('textFields').style.display = type === 'text' ? 'block' : 'none';
+        document.getElementById('productFields').style.display = type === 'product' ? 'block' : 'none';
+    }
+
+    document.getElementById('addKnowledgeForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(e.target);
+        const type = formData.get('source_type');
+        const botId = document.getElementById('botSelector').value;
+
+        let data = { title: formData.get('title') };
+
+        if (type === 'faq') {
+            data.question = formData.get('question');
+            data.answer = formData.get('answer');
+        } else if (type === 'text') {
+            data.content = formData.get('content');
+        } else if (type === 'product') {
+            data.content = formData.get('product_content');
+            data.price = parseInt(formData.get('price')) || 0;
+            data.sku = formData.get('sku');
+        }
+
+        const endpoint = type === 'faq'
+            ? `/bots/${botId}/knowledge/faq`
+            : `/bots/${botId}/knowledge`;
+
+        const result = await api.post(endpoint, data);
+
+        if (result.ok) {
+            UI.hideModal('addKnowledgeModal');
+            UI.showAlert('Ma\'lumot qo\'shildi!', 'success');
+            setTimeout(() => window.location.reload(), 1000);
+        } else {
+            document.getElementById('addKnowledgeError').textContent = result.data?.detail || 'Xatolik';
+            document.getElementById('addKnowledgeError').style.display = 'block';
+        }
+    });
+
+    async function deleteItem(id) {
+        if (!confirm('Rostdan o\'chirmoqchimisiz?')) return;
+
+        const botId = document.getElementById('botSelector').value;
+        const result = await api.delete(`/bots/${botId}/knowledge/${id}`);
+
+        if (result.ok) {
+            UI.showAlert('O\'chirildi!', 'success');
+            setTimeout(() => window.location.reload(), 500);
+        } else {
+            UI.showAlert('Xatolik yuz berdi', 'danger');
+        }
+    }
+</script>
+{% endblock %}
+{% endblock %}
