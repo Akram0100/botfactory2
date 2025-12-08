@@ -30,6 +30,21 @@ class Settings(BaseSettings):
     DB_MAX_OVERFLOW: int = 10
     DB_ECHO: bool = False
 
+    @property
+    def async_database_url(self) -> str:
+        """Convert DATABASE_URL to async format."""
+        url = self.DATABASE_URL
+        # Convert postgresql:// to postgresql+asyncpg://
+        if url.startswith("postgresql://"):
+            url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+        # Convert postgres:// to postgresql+asyncpg://
+        elif url.startswith("postgres://"):
+            url = url.replace("postgres://", "postgresql+asyncpg://", 1)
+        # Handle sslmode parameter for asyncpg
+        if "sslmode=" in url:
+            url = url.replace("sslmode=", "ssl=")
+        return url
+
     # Redis
     REDIS_URL: str = "redis://localhost:6379/0"
 
