@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Yangi bot yaratish - BotFactory AI{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Page Header -->
+    <div style="margin-bottom: 2rem;">
+        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
+            <a href="/bots" class="btn btn-secondary btn-sm">← Orqaga</a>
+            <h1 style="margin: 0;">Yangi bot yaratish</h1>
+        </div>
+        <p style="margin: 0; color: var(--text-secondary);">AI chatbotingizni yarating va sozlang</p>
+    </div>
+
+    <div class="grid grid-cols-3 gap-6">
+        <!-- Main Form -->
+        <div style="grid-column: span 2;">
+            <div class="card">
+                <form id="createBotForm">
+                    <div class="form-group">
+                        <label class="form-label">Bot nomi *</label>
+                        <input type="text" name="name" class="form-input" placeholder="Masalan: Savdo yordamchisi"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Platforma *</label>
+                        <select name="platform" class="form-input" required>
+                            <option value="telegram">📱 Telegram</option>
+                            <option value="whatsapp" disabled>💬 WhatsApp (tez kunda)</option>
+                            <option value="instagram" disabled>📷 Instagram (tez kunda)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Bot token *</label>
+                        <input type="text" name="token" class="form-input" placeholder="123456:ABC-DEF..." required>
+                        <small style="color: var(--text-muted);">
+                            Telegram: @BotFather dan oling
+                        </small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Tavsif</label>
+                        <textarea name="description" class="form-input" rows="2"
+                            placeholder="Bot haqida qisqacha..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Salomlash xabari</label>
+                        <textarea name="welcome_message" class="form-input" rows="3"
+                            placeholder="Salom! Men sizga qanday yordam bera olaman?"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Til</label>
+                        <select name="language" class="form-input">
+                            <option value="uz">🇺🇿 O'zbek</option>
+                            <option value="ru">🇷🇺 Rus</option>
+                            <option value="en">🇬🇧 Ingliz</option>
+                        </select>
+                    </div>
+
+                    <div id="createBotError" class="alert alert-danger" style="display: none;"></div>
+
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button type="submit" class="btn btn-primary">Yaratish</button>
+                        <a href="/bots" class="btn btn-secondary">Bekor qilish</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Sidebar Help -->
+        <div>
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <h4 style="margin-bottom: 1rem;">📱 Token qanday olish?</h4>
+                <ol style="margin: 0; padding-left: 1.25rem; color: var(--text-secondary); font-size: 0.875rem;">
+                    <li style="margin-bottom: 0.5rem;">Telegram'da @BotFather ni oching</li>
+                    <li style="margin-bottom: 0.5rem;">/newbot buyrug'ini yuboring</li>
+                    <li style="margin-bottom: 0.5rem;">Bot nomini kiriting</li>
+                    <li style="margin-bottom: 0.5rem;">Username kiriting (oxiri "bot" bilan)</li>
+                    <li>Token nusxalang va shu yerga joylashtiring</li>
+                </ol>
+            </div>
+
+            <div class="card">
+                <h4 style="margin-bottom: 1rem;">💡 Maslahat</h4>
+                <p style="margin: 0; color: var(--text-secondary); font-size: 0.875rem;">
+                    Bot yaratganingizdan so'ng, unga bilimlar bazasi qo'shishni unutmang.
+                    Bu bot javoblarini aniqroq qiladi.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    document.getElementById('createBotForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData);
+
+        const errorDiv = document.getElementById('createBotError');
+        errorDiv.style.display = 'none';
+
+        const result = await api.post('/bots', data);
+
+        if (result.ok) {
+            UI.showAlert('Bot muvaffaqiyatli yaratildi!', 'success');
+            setTimeout(() => window.location.href = '/bots', 1000);
+        } else {
+            errorDiv.textContent = result.data?.detail || 'Xatolik yuz berdi';
+            errorDiv.style.display = 'block';
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}

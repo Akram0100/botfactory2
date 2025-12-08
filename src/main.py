@@ -253,6 +253,21 @@ async def bots_page(request: Request):
     })
 
 
+@app.get("/bots/new", response_class=HTMLResponse, tags=["Pages"])
+async def new_bot_page(request: Request):
+    """New bot creation page."""
+    mock_user = {
+        "username": "demo_user",
+        "subscription_type": type("obj", (object,), {"value": "starter"})(),
+    }
+    
+    return templates.TemplateResponse("bot_new.html", {
+        "request": request,
+        "user": mock_user,
+        "active_page": "bots",
+    })
+
+
 @app.get("/bots/{bot_id}", response_class=HTMLResponse, tags=["Pages"])
 async def bot_detail_page(request: Request, bot_id: int):
     """Bot detail/settings page."""
