@@ -3,139 +3,203 @@
 {% block title %}Dashboard - BotFactory AI{% endblock %}
 
 {% block content %}
-<div class="container">
-    <!-- Page Header -->
-    <div class="flex justify-between items-center" style="margin-bottom: 2rem;">
-        <div>
-            <h1>Xush kelibsiz, {{ user.full_name or user.username }}!</h1>
-            <p style="margin: 0;">Bugungi statistika va botlaringizni boshqaring</p>
-        </div>
-        <a href="/bots/new" class="btn btn-primary">
-            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            Yangi bot yaratish
-        </a>
+<div class="container" id="dashboardContainer">
+    <!-- Loading State -->
+    <div id="loadingState" class="empty-state">
+        <div class="spinner"></div>
+        <p>Yuklanmoqda...</p>
     </div>
 
-    <!-- Stats Grid -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-value">{{ stats.total_bots }}</div>
-            <div class="stat-label">Jami botlar</div>
+    <!-- Dashboard Content (hidden initially) -->
+    <div id="dashboardContent" style="display: none;">
+        <!-- Page Header -->
+        <div class="flex justify-between items-center" style="margin-bottom: 2rem;">
+            <div>
+                <h1>Xush kelibsiz, <span id="userName">Foydalanuvchi</span>!</h1>
+                <p style="margin: 0;">Bugungi statistika va botlaringizni boshqaring</p>
+            </div>
+            <a href="/bots/new" class="btn btn-primary">
+                <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Yangi bot yaratish
+            </a>
         </div>
-        <div class="stat-card accent">
-            <div class="stat-value">{{ stats.active_bots }}</div>
-            <div class="stat-label">Faol botlar</div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="totalBots">0</div>
+                <div class="stat-label">Jami botlar</div>
+            </div>
+            <div class="stat-card accent">
+                <div class="stat-value" id="activeBots">0</div>
+                <div class="stat-label">Faol botlar</div>
+            </div>
+            <div class="stat-card secondary">
+                <div class="stat-value" id="totalMessages">0</div>
+                <div class="stat-label">Bugungi xabarlar</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalUsers">0</div>
+                <div class="stat-label">Foydalanuvchilar</div>
+            </div>
         </div>
-        <div class="stat-card secondary">
-            <div class="stat-value">{{ stats.total_messages | default('0') }}</div>
-            <div class="stat-label">Bugungi xabarlar</div>
+
+        <!-- Subscription Status -->
+        <div class="card" style="margin-bottom: 2rem;">
+            <div class="card-header">
+                <h3 class="card-title">Obuna holati</h3>
+                <span class="badge badge-success" id="subscriptionBadge">FREE</span>
+            </div>
+            <div class="flex gap-6">
+                <div>
+                    <div class="stat-label">Bot limiti</div>
+                    <div style="font-size: 1.25rem; font-weight: 600;">
+                        <span id="botCount">0</span> / <span id="botLimit">1</span>
+                    </div>
+                </div>
+                <div>
+                    <div class="stat-label">Xabar limiti</div>
+                    <div style="font-size: 1.25rem; font-weight: 600;">
+                        <span id="messagesUsed">0</span> / <span id="messageLimit">100</span>
+                    </div>
+                </div>
+                <div style="margin-left: auto;">
+                    <a href="/pricing" class="btn btn-secondary">Obunani yangilash</a>
+                </div>
+            </div>
         </div>
-        <div class="stat-card">
-            <div class="stat-value">{{ stats.total_users | default('0') }}</div>
-            <div class="stat-label">Foydalanuvchilar</div>
+
+        <!-- Recent Bots -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Botlarim</h3>
+                <a href="/bots" class="btn btn-secondary btn-sm">Hammasini ko'rish</a>
+            </div>
+
+            <div id="botsContainer">
+                <!-- Bots will be loaded here -->
+            </div>
         </div>
     </div>
 
-    <!-- Subscription Status -->
-    <div class="card" style="margin-bottom: 2rem;">
-        <div class="card-header">
-            <h3 class="card-title">Obuna holati</h3>
-            <span class="badge {% if user.is_subscription_active %}badge-success{% else %}badge-warning{% endif %}">
-                {{ user.subscription_type.value | upper }}
-            </span>
-        </div>
-        <div class="flex gap-6">
-            <div>
-                <div class="stat-label">Bot limiti</div>
-                <div style="font-size: 1.25rem; font-weight: 600;">
-                    {{ stats.total_bots }} / {{ user.bot_limit }}
-                </div>
-            </div>
-            <div>
-                <div class="stat-label">Xabar limiti</div>
-                <div style="font-size: 1.25rem; font-weight: 600;">
-                    {{ user.messages_this_month }} / {{ user.message_limit }}
-                </div>
-            </div>
-            {% if user.subscription_expires_at %}
-            <div>
-                <div class="stat-label">Amal qilish muddati</div>
-                <div style="font-size: 1.25rem; font-weight: 600;">
-                    {{ user.subscription_expires_at.strftime('%d.%m.%Y') }}
-                </div>
-            </div>
-            {% endif %}
-            <div style="margin-left: auto;">
-                <a href="/pricing" class="btn btn-secondary">Obunani yangilash</a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Recent Bots -->
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">Botlarim</h3>
-            <a href="/bots" class="btn btn-secondary btn-sm">Hammasini ko'rish</a>
-        </div>
-
-        {% if bots %}
-        <div class="grid grid-cols-3 gap-4">
-            {% for bot in bots[:6] %}
-            <div class="bot-card">
-                <div class="bot-header">
-                    <div class="bot-avatar">🤖</div>
-                    <div class="bot-info">
-                        <h3 style="margin: 0;">{{ bot.name }}</h3>
-                        <span class="bot-platform">
-                            {% if bot.platform.value == 'telegram' %}
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                                <path
-                                    d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.18 1.897-.962 6.502-1.359 8.627-.168.9-.5 1.201-.82 1.23-.697.064-1.226-.461-1.901-.903-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.015-.15-.056-.212s-.174-.041-.248-.024c-.106.024-1.793 1.139-5.062 3.345-.479.329-.913.489-1.302.481-.428-.009-1.252-.242-1.865-.44-.752-.244-1.349-.374-1.297-.789.027-.216.324-.437.893-.663 3.498-1.524 5.831-2.529 6.998-3.015 3.333-1.386 4.025-1.627 4.477-1.635.099-.002.321.023.465.141.121.099.154.232.17.325.015.093.034.305.019.471z" />
-                            </svg>
-                            {% endif %}
-                            {{ bot.platform.value | title }}
-                        </span>
-                    </div>
-                    <span class="badge {% if bot.is_active %}badge-success{% else %}badge-warning{% endif %}"
-                        style="margin-left: auto;">
-                        {{ 'Faol' if bot.is_active else 'Nofaol' }}
-                    </span>
-                </div>
-                <div class="bot-stats">
-                    <div class="bot-stat">
-                        <div class="bot-stat-value">{{ bot.total_messages }}</div>
-                        <div class="bot-stat-label">Xabarlar</div>
-                    </div>
-                    <div class="bot-stat">
-                        <div class="bot-stat-value">{{ bot.total_users }}</div>
-                        <div class="bot-stat-label">Foydalanuvchilar</div>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-        {% else %}
-        <div class="empty-state">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                    d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
-            <h3>Hali botlar yo'q</h3>
-            <p>Birinchi AI chatbotingizni yarating!</p>
-            <a href="/bots/new" class="btn btn-primary">Bot yaratish</a>
-        </div>
-        {% endif %}
+    <!-- Not Logged In State -->
+    <div id="notLoggedIn" style="display: none;" class="empty-state">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+        </svg>
+        <h3>Tizimga kiring</h3>
+        <p>Dashboard ko'rish uchun avval tizimga kirishingiz kerak.</p>
+        <a href="/login" class="btn btn-primary">Kirish</a>
     </div>
 </div>
 
 {% block extra_js %}
 <script>
-    // Check if user is logged in
-    if (!Auth.isLoggedIn()) {
-        window.location.href = '/login';
+    async function loadDashboard() {
+        // Check if user is logged in
+        if (!Auth.isLoggedIn()) {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('notLoggedIn').style.display = 'block';
+            return;
+        }
+
+        try {
+            // Fetch user data
+            const userResult = await api.get('/auth/me');
+            if (!userResult.ok) {
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('notLoggedIn').style.display = 'block';
+                return;
+            }
+
+            const user = userResult.data;
+
+            // Fetch bots
+            const botsResult = await api.get('/bots');
+            const bots = botsResult.ok ? botsResult.data.items || [] : [];
+
+            // Calculate stats
+            const totalBots = bots.length;
+            const activeBots = bots.filter(b => b.is_active).length;
+            const totalMessages = bots.reduce((sum, b) => sum + (b.total_messages || 0), 0);
+            const totalUsers = bots.reduce((sum, b) => sum + (b.total_users || 0), 0);
+
+            // Update UI
+            document.getElementById('userName').textContent = user.full_name || user.username;
+            document.getElementById('totalBots').textContent = totalBots;
+            document.getElementById('activeBots').textContent = activeBots;
+            document.getElementById('totalMessages').textContent = totalMessages;
+            document.getElementById('totalUsers').textContent = totalUsers;
+
+            document.getElementById('subscriptionBadge').textContent = (user.subscription_type || 'free').toUpperCase();
+            document.getElementById('botCount').textContent = totalBots;
+            document.getElementById('botLimit').textContent = user.bot_limit || 1;
+            document.getElementById('messagesUsed').textContent = user.messages_this_month || 0;
+            document.getElementById('messageLimit').textContent = user.message_limit || 100;
+
+            // Render bots
+            const botsContainer = document.getElementById('botsContainer');
+            if (bots.length > 0) {
+                botsContainer.innerHTML = `
+                    <div class="grid grid-cols-3 gap-4">
+                        ${bots.slice(0, 6).map(bot => `
+                            <div class="bot-card" onclick="window.location.href='/bots/${bot.id}'" style="cursor: pointer;">
+                                <div class="bot-header">
+                                    <div class="bot-avatar">🤖</div>
+                                    <div class="bot-info">
+                                        <h3 style="margin: 0;">${bot.name}</h3>
+                                        <span class="bot-platform">
+                                            📱 ${(bot.platform || 'telegram').charAt(0).toUpperCase() + (bot.platform || 'telegram').slice(1)}
+                                        </span>
+                                    </div>
+                                    <span class="badge ${bot.is_active ? 'badge-success' : 'badge-warning'}" style="margin-left: auto;">
+                                        ${bot.is_active ? 'Faol' : 'Nofaol'}
+                                    </span>
+                                </div>
+                                <div class="bot-stats">
+                                    <div class="bot-stat">
+                                        <div class="bot-stat-value">${bot.total_messages || 0}</div>
+                                        <div class="bot-stat-label">Xabarlar</div>
+                                    </div>
+                                    <div class="bot-stat">
+                                        <div class="bot-stat-value">${bot.total_users || 0}</div>
+                                        <div class="bot-stat-label">Foydalanuvchilar</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } else {
+                botsContainer.innerHTML = `
+                    <div class="empty-state">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        <h3>Hali botlar yo'q</h3>
+                        <p>Birinchi AI chatbotingizni yarating!</p>
+                        <a href="/bots/new" class="btn btn-primary">Bot yaratish</a>
+                    </div>
+                `;
+            }
+
+            // Show dashboard
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('dashboardContent').style.display = 'block';
+
+        } catch (error) {
+            console.error('Dashboard error:', error);
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('notLoggedIn').style.display = 'block';
+        }
     }
+
+    // Load dashboard on page load
+    document.addEventListener('DOMContentLoaded', loadDashboard);
 </script>
 {% endblock %}
 {% endblock %}
