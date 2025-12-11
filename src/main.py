@@ -76,7 +76,7 @@ app.add_middleware(
 async def add_security_headers(request: Request, call_next):
     response = await call_next(request)
     response.headers["X-Content-Type-Options"] = "nosniff"
-    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-Frame-Options"] = "SAMEORIGIN"
     response.headers["X-XSS-Protection"] = "1; mode=block"
     if not settings.DEBUG:
         response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
@@ -412,7 +412,7 @@ if __name__ == "__main__":
     uvicorn.run(
         "src.main:app",
         host="0.0.0.0",
-        port=8000,
+        port=5000,
         reload=settings.DEBUG,
     )
 
