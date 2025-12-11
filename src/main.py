@@ -34,7 +34,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator:
     """Application lifespan handler."""
     # Startup
     logger.info("Starting BotFactory AI...")
-    # await init_db()  # Uncomment when using Alembic migrations
+    await init_db()  # Create tables if they don't exist
     logger.info("BotFactory AI started successfully")
     
     yield

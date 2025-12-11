@@ -34,6 +34,9 @@ class Settings(BaseSettings):
     def async_database_url(self) -> str:
         """Convert DATABASE_URL to async format."""
         url = self.DATABASE_URL
+        # SQLite support
+        if url.startswith("sqlite:///"):
+            return url.replace("sqlite:///", "sqlite+aiosqlite:///", 1)
         # Convert postgresql:// to postgresql+asyncpg://
         if url.startswith("postgresql://"):
             url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
