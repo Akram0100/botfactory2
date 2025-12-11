@@ -18,79 +18,14 @@
         </button>
     </div>
 
-    <!-- Bots Grid -->
-    {% if bots %}
-    <div class="grid grid-cols-3 gap-4">
-        {% for bot in bots %}
-        <div class="bot-card" data-bot-id="{{ bot.id }}">
-            <div class="bot-header">
-                <div class="bot-avatar">🤖</div>
-                <div class="bot-info">
-                    <h3 style="margin: 0;">{{ bot.name }}</h3>
-                    <span class="bot-platform">
-                        {% if bot.platform.value == 'telegram' %}📱{% endif %}
-                        {{ bot.platform.value | title }}
-                    </span>
-                </div>
-                <span class="badge {% if bot.is_active %}badge-success{% else %}badge-warning{% endif %}"
-                    style="margin-left: auto;">
-                    {{ 'Faol' if bot.is_active else 'Nofaol' }}
-                </span>
-            </div>
-
-            <p style="color: var(--text-secondary); font-size: 0.875rem; margin: 1rem 0;">
-                {{ bot.description or 'Tavsif yo\'q' }}
-            </p>
-
-            <div class="bot-stats">
-                <div class="bot-stat">
-                    <div class="bot-stat-value">{{ bot.total_messages or 0 }}</div>
-                    <div class="bot-stat-label">Xabarlar</div>
-                </div>
-                <div class="bot-stat">
-                    <div class="bot-stat-value">{{ bot.total_users or 0 }}</div>
-                    <div class="bot-stat-label">Foydalanuvchilar</div>
-                </div>
-                <div class="bot-stat">
-                    <div class="bot-stat-value">{{ bot.knowledge_count or 0 }}</div>
-                    <div class="bot-stat-label">Bilimlar</div>
-                </div>
-            </div>
-
-            <div
-                style="display: flex; gap: 0.5rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
-                <a href="/bots/{{ bot.id }}" class="btn btn-secondary btn-sm" style="flex: 1;">
-                    Sozlamalar
-                </a>
-                <a href="/bots/{{ bot.id }}/knowledge" class="btn btn-secondary btn-sm" style="flex: 1;">
-                    Bilimlar
-                </a>
-                {% if bot.is_active %}
-                <button onclick="toggleBot({{ bot.id }}, false)" class="btn btn-danger btn-sm">
-                    O'chirish
-                </button>
-                {% else %}
-                <button onclick="toggleBot({{ bot.id }}, true)" class="btn btn-success btn-sm">
-                    Yoqish
-                </button>
-                {% endif %}
-            </div>
-        </div>
-        {% endfor %}
+    <!-- Loading State -->
+    <div id="loadingState" class="empty-state">
+        <div class="spinner"></div>
+        <p>Yuklanmoqda...</p>
     </div>
-    {% else %}
-    <div class="card">
-        <div class="empty-state">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                    d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-            </svg>
-            <h3>Hali botlar yo'q</h3>
-            <p>Birinchi AI chatbotingizni yarating va biznesingizni avtomatlashiring!</p>
-            <button onclick="UI.showModal('createBotModal')" class="btn btn-primary">Bot yaratish</button>
-        </div>
-    </div>
-    {% endif %}
+
+    <!-- Bots Container (loaded via JS) -->
+    <div id="botsContainer" style="display: none;"></div>
 </div>
 
 <!-- Create Bot Modal -->
@@ -129,15 +64,6 @@
                     <textarea name="description" class="form-input" placeholder="Bot haqida qisqacha..."></textarea>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">Til</label>
-                    <select name="language" class="form-input">
-                        <option value="uz">O'zbek</option>
-                        <option value="ru">Rus</option>
-                        <option value="en">Ingliz</option>
-                    </select>
-                </div>
-
                 <div id="createBotError" class="alert alert-danger" style="display: none;"></div>
             </div>
             <div class="modal-footer">
@@ -151,9 +77,87 @@
 
 {% block extra_js %}
 <script>
-    // Check if user is logged in
-    if (!Auth.isLoggedIn()) {
-        window.location.href = '/login';
+    // Load bots from API
+    async function loadBots() {
+        if (!Auth.isLoggedIn()) {
+            window.location.href = '/login';
+            return;
+        }
+
+        try {
+            const result = await api.get('/bots');
+            const bots = result.ok ? (result.data.items || result.data || []) : [];
+
+            const container = document.getElementById('botsContainer');
+
+            if (bots.length > 0) {
+                container.innerHTML = `
+                    <div class="grid grid-cols-3 gap-4">
+                        ${bots.map(bot => `
+                            <div class="bot-card" data-bot-id="${bot.id}">
+                                <div class="bot-header">
+                                    <div class="bot-avatar">🤖</div>
+                                    <div class="bot-info">
+                                        <h3 style="margin: 0;">${bot.name}</h3>
+                                        <span class="bot-platform">
+                                            📱 ${(bot.platform || 'telegram').charAt(0).toUpperCase() + (bot.platform || 'telegram').slice(1)}
+                                        </span>
+                                    </div>
+                                    <span class="badge ${bot.is_active ? 'badge-success' : 'badge-warning'}" style="margin-left: auto;">
+                                        ${bot.is_active ? 'Faol' : 'Nofaol'}
+                                    </span>
+                                </div>
+
+                                <p style="color: var(--text-secondary); font-size: 0.875rem; margin: 1rem 0;">
+                                    ${bot.description || "Tavsif yo'q"}
+                                </p>
+
+                                <div class="bot-stats">
+                                    <div class="bot-stat">
+                                        <div class="bot-stat-value">${bot.total_messages || 0}</div>
+                                        <div class="bot-stat-label">Xabarlar</div>
+                                    </div>
+                                    <div class="bot-stat">
+                                        <div class="bot-stat-value">${bot.total_users || 0}</div>
+                                        <div class="bot-stat-label">Foydalanuvchilar</div>
+                                    </div>
+                                </div>
+
+                                <div style="display: flex; gap: 0.5rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                                    <a href="/bots/${bot.id}" class="btn btn-secondary btn-sm" style="flex: 1;">
+                                        Sozlamalar
+                                    </a>
+                                    <button onclick="toggleBot(${bot.id}, ${!bot.is_active})" class="btn ${bot.is_active ? 'btn-danger' : 'btn-success'} btn-sm">
+                                        ${bot.is_active ? "O'chirish" : 'Yoqish'}
+                                    </button>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="card">
+                        <div class="empty-state">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            <h3>Hali botlar yo'q</h3>
+                            <p>Birinchi AI chatbotingizni yarating va biznesingizni avtomatlashiring!</p>
+                            <button onclick="UI.showModal('createBotModal')" class="btn btn-primary">Bot yaratish</button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            document.getElementById('loadingState').style.display = 'none';
+            container.style.display = 'block';
+
+        } catch (error) {
+            console.error('Error loading bots:', error);
+            document.getElementById('loadingState').innerHTML = '<p>Xatolik yuz berdi</p>';
+        }
     }
 
     // Create bot form
@@ -171,7 +175,7 @@
         if (result.ok) {
             UI.hideModal('createBotModal');
             UI.showAlert('Bot muvaffaqiyatli yaratildi!', 'success');
-            setTimeout(() => window.location.reload(), 1000);
+            loadBots(); // Reload bots list
         } else {
             errorDiv.textContent = result.data?.detail || 'Xatolik yuz berdi';
             errorDiv.style.display = 'block';
@@ -184,12 +188,15 @@
         const result = await api.post(endpoint);
 
         if (result.ok) {
-            UI.showAlert(activate ? 'Bot yoqildi!' : 'Bot o\'chirildi!', 'success');
-            setTimeout(() => window.location.reload(), 1000);
+            UI.showAlert(activate ? 'Bot yoqildi!' : "Bot o'chirildi!", 'success');
+            loadBots(); // Reload bots list
         } else {
             UI.showAlert(result.data?.detail || 'Xatolik yuz berdi', 'danger');
         }
     }
+
+    // Load bots on page load
+    document.addEventListener('DOMContentLoaded', loadBots);
 </script>
 {% endblock %}
 {% endblock %}
