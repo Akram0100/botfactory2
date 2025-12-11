@@ -13,21 +13,25 @@ from sqlalchemy.ext.asyncio import (
 from src.core.config import settings
 
 # Create async engine
-# Note: SQLite doesn't support pool_size/max_overflow, so we conditionally add them
-engine_kwargs = {
-    "echo": settings.DB_ECHO,
-    "pool_pre_ping": True,
-}
+# Note: SQLite doesn't support pool_size/max_overflow/pool_pre_ping
+db_url = settings.async_database_url
+is_sqlite = db_url.startswith("sqlite")
 
-# Only add pool settings for non-SQLite databases
-if not settings.async_database_url.startswith("sqlite"):
-    engine_kwargs["pool_size"] = settings.DB_POOL_SIZE
-    engine_kwargs["max_overflow"] = settings.DB_MAX_OVERFLOW
-
-engine = create_async_engine(
-    settings.async_database_url,
-    **engine_kwargs,
-)
+if is_sqlite:
+    # SQLite: minimal config
+    engine = create_async_engine(
+        db_url,
+        echo=settings.DB_ECHO,
+    )
+else:
+    # PostgreSQL: full config with pooling
+    engine = create_async_engine(
+        db_url,
+        echo=settings.DB_ECHO,
+        pool_size=settings.DB_POOL_SIZE,
+        max_overflow=settings.DB_MAX_OVERFLOW,
+        pool_pre_ping=True,
+    )
 
 # Session factory
 async_session_factory = async_sessionmaker(
