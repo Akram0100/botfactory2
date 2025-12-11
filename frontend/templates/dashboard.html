@@ -129,4 +129,13 @@
         {% endif %}
     </div>
 </div>
+
+{% block extra_js %}
+<script>
+    // Check if user is logged in
+    if (!Auth.isLoggedIn()) {
+        window.location.href = '/login';
+    }
+</script>
+{% endblock %}
 {% endblock %}

@@ -151,6 +151,11 @@
 
 {% block extra_js %}
 <script>
+    // Check if user is logged in
+    if (!Auth.isLoggedIn()) {
+        window.location.href = '/login';
+    }
+
     // Create bot form
     document.getElementById('createBotForm').addEventListener('submit', async (e) => {
         e.preventDefault();
