@@ -172,83 +172,24 @@ async def register_page(request: Request):
 
 @app.get("/dashboard", response_class=HTMLResponse, tags=["Pages"])
 async def dashboard_page(request: Request):
-    """Dashboard page (demo with mock data)."""
-    # Mock user data for demo
-    mock_user = {
-        "username": "demo_user",
-        "full_name": "Demo Foydalanuvchi",
-        "subscription_type": type("obj", (object,), {"value": "free"})(),
-        "is_subscription_active": True,
-        "bot_limit": 1,
-        "message_limit": 100,
-        "messages_this_month": 42,
-        "subscription_expires_at": None,
-    }
-    
-    mock_stats = {
-        "total_bots": 1,
-        "active_bots": 1,
-        "total_messages": 142,
-        "total_users": 28,
-    }
-    
-    mock_bots = [
-        {
-            "id": 1,
-            "name": "Demo Bot",
-            "platform": type("obj", (object,), {"value": "telegram"})(),
-            "is_active": True,
-            "total_messages": 142,
-            "total_users": 28,
-        }
-    ]
-    
+    """Dashboard page - requires authentication."""
+    # Empty state - user needs to login
     return templates.TemplateResponse("dashboard.html", {
         "request": request,
-        "user": mock_user,
-        "stats": mock_stats,
-        "bots": mock_bots,
+        "user": None,
+        "stats": {"total_bots": 0, "active_bots": 0, "total_messages": 0, "total_users": 0},
+        "bots": [],
         "active_page": "dashboard",
     })
 
 
 @app.get("/bots", response_class=HTMLResponse, tags=["Pages"])
 async def bots_page(request: Request):
-    """Bots management page (demo with mock data)."""
-    mock_user = {
-        "username": "demo_user",
-        "full_name": "Demo Foydalanuvchi",
-        "subscription_type": type("obj", (object,), {"value": "starter"})(),
-        "is_subscription_active": True,
-    }
-    
-    mock_bots = [
-        {
-            "id": 1,
-            "name": "Savdo yordamchisi",
-            "description": "Mijozlarga mahsulotlar haqida ma'lumot beradi",
-            "platform": type("obj", (object,), {"value": "telegram"})(),
-            "is_active": True,
-            "total_messages": 1542,
-            "total_users": 128,
-            "knowledge_count": 45,
-        },
-        {
-            "id": 2,
-            "name": "FAQ Bot",
-            "description": "Ko'p so'raladigan savollarga javob beradi",
-            "platform": type("obj", (object,), {"value": "telegram"})(),
-            "is_active": False,
-            "total_messages": 856,
-            "total_users": 67,
-            "knowledge_count": 23,
-        },
-    ]
-    
+    """Bots management page."""
     return templates.TemplateResponse("bots.html", {
         "request": request,
-        "user": mock_user,
-        "bots": mock_bots,
+        "user": None,
+        "bots": [],
         "active_page": "bots",
     })
 
@@ -256,14 +197,9 @@ async def bots_page(request: Request):
 @app.get("/bots/new", response_class=HTMLResponse, tags=["Pages"])
 async def new_bot_page(request: Request):
     """New bot creation page."""
-    mock_user = {
-        "username": "demo_user",
-        "subscription_type": type("obj", (object,), {"value": "starter"})(),
-    }
-    
     return templates.TemplateResponse("bot_new.html", {
         "request": request,
-        "user": mock_user,
+        "user": None,
         "active_page": "bots",
     })
 
@@ -271,26 +207,10 @@ async def new_bot_page(request: Request):
 @app.get("/bots/{bot_id}", response_class=HTMLResponse, tags=["Pages"])
 async def bot_detail_page(request: Request, bot_id: int):
     """Bot detail/settings page."""
-    mock_user = {
-        "username": "demo_user",
-        "subscription_type": type("obj", (object,), {"value": "starter"})(),
-    }
-    
-    mock_bot = {
-        "id": bot_id,
-        "name": "Savdo yordamchisi",
-        "description": "Mijozlarga mahsulotlar haqida ma'lumot beradi",
-        "platform": type("obj", (object,), {"value": "telegram"})(),
-        "is_active": True,
-        "token": "123456:ABC...",
-        "welcome_message": "Salom! Men sizga qanday yordam bera olaman?",
-        "ai_prompt": "Siz do'kon yordamchisisiz...",
-    }
-    
     return templates.TemplateResponse("bot_detail.html", {
         "request": request,
-        "user": mock_user,
-        "bot": mock_bot,
+        "user": None,
+        "bot": None,
         "active_page": "bots",
     })
 
@@ -298,18 +218,11 @@ async def bot_detail_page(request: Request, bot_id: int):
 @app.get("/bots/{bot_id}/knowledge", response_class=HTMLResponse, tags=["Pages"])
 async def bot_knowledge_page(request: Request, bot_id: int):
     """Bot knowledge base page."""
-    mock_user = {
-        "username": "demo_user",
-        "subscription_type": type("obj", (object,), {"value": "starter"})(),
-    }
-    
-    mock_bot = {"id": bot_id, "name": "Savdo yordamchisi"}
-    
     return templates.TemplateResponse("knowledge.html", {
         "request": request,
-        "user": mock_user,
-        "bots": [mock_bot],
-        "stats": {"total": 45, "faq": 20, "products": 15, "texts": 10},
+        "user": None,
+        "bots": [],
+        "stats": {"total": 0, "faq": 0, "products": 0, "texts": 0},
         "knowledge_items": [],
         "active_page": "knowledge",
     })
@@ -319,30 +232,12 @@ async def bot_knowledge_page(request: Request, bot_id: int):
 @app.get("/knowledge", response_class=HTMLResponse, tags=["Pages"])
 async def knowledge_page(request: Request):
     """Knowledge base management page."""
-    mock_user = {
-        "username": "demo_user",
-        "subscription_type": type("obj", (object,), {"value": "starter"})(),
-    }
-    
-    mock_bots = [
-        {"id": 1, "name": "Savdo yordamchisi"},
-        {"id": 2, "name": "FAQ Bot"},
-    ]
-    
-    mock_stats = {"total": 68, "faq": 23, "products": 30, "texts": 15}
-    
-    mock_items = [
-        {"id": 1, "source_type": "faq", "title": "Yetkazib berish", "question": "Yetkazib berish bormi?", "is_active": True, "created_at": "15.01.2024"},
-        {"id": 2, "source_type": "product", "title": "iPhone 15 Pro", "question": None, "is_active": True, "created_at": "14.01.2024"},
-        {"id": 3, "source_type": "text", "title": "Kompaniya haqida", "question": None, "is_active": True, "created_at": "10.01.2024"},
-    ]
-    
     return templates.TemplateResponse("knowledge.html", {
         "request": request,
-        "user": mock_user,
-        "bots": mock_bots,
-        "stats": mock_stats,
-        "knowledge_items": mock_items,
+        "user": None,
+        "bots": [],
+        "stats": {"total": 0, "faq": 0, "products": 0, "texts": 0},
+        "knowledge_items": [],
         "active_page": "knowledge",
     })
 
@@ -350,20 +245,10 @@ async def knowledge_page(request: Request):
 @app.get("/analytics", response_class=HTMLResponse, tags=["Pages"])
 async def analytics_page(request: Request):
     """Analytics dashboard page."""
-    mock_user = {
-        "username": "demo_user",
-        "subscription_type": type("obj", (object,), {"value": "basic"})(),
-    }
-    
-    mock_bots = [
-        {"id": 1, "name": "Savdo yordamchisi"},
-        {"id": 2, "name": "FAQ Bot"},
-    ]
-    
     return templates.TemplateResponse("analytics.html", {
         "request": request,
-        "user": mock_user,
-        "bots": mock_bots,
+        "user": None,
+        "bots": [],
         "stats": {},
         "active_page": "analytics",
     })
@@ -372,18 +257,9 @@ async def analytics_page(request: Request):
 @app.get("/settings", response_class=HTMLResponse, tags=["Pages"])
 async def settings_page(request: Request):
     """User settings page."""
-    mock_user = {
-        "username": "demo_user",
-        "email": "demo@example.com",
-        "full_name": "Demo Foydalanuvchi",
-        "phone": "+998 90 123 45 67",
-        "subscription_type": type("obj", (object,), {"value": "starter"})(),
-        "subscription_expires_at": "15.02.2024",
-    }
-    
     return templates.TemplateResponse("settings.html", {
         "request": request,
-        "user": mock_user,
+        "user": None,
         "active_page": "settings",
     })
 
