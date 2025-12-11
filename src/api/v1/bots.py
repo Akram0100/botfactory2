@@ -202,7 +202,45 @@ async def activate_bot(
     """
     Botni faollashtirish.
     """
+    import os
+    from src.services.bots.telegram import TelegramBot
+    
     bot = await get_user_bot(bot_id, current_user, db)
+    
+    # Set up webhook for Telegram bots
+    if bot.platform == BotPlatform.TELEGRAM:
+        telegram_bot = TelegramBot(
+            bot_id=bot.id,
+            token=bot.token,
+            config=bot.settings or {},
+        )
+        
+        # Validate token first
+        try:
+            is_valid = await telegram_bot.validate_token()
+            if not is_valid:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Telegram token noto'g'ri",
+                )
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Token tekshirishda xatolik: {str(e)}",
+            )
+        
+        # Set up webhook
+        base_url = os.environ.get("WEBHOOK_BASE_URL", os.environ.get("REPLIT_DEV_DOMAIN", ""))
+        if base_url and not base_url.startswith("http"):
+            base_url = f"https://{base_url}"
+        
+        if base_url:
+            webhook_url = f"{base_url}/api/v1/webhooks/telegram/{bot.token}"
+            try:
+                await telegram_bot.setup_webhook(webhook_url)
+                bot.webhook_url = webhook_url
+            except Exception as e:
+                api_logger.warning(f"Failed to set webhook: {e}")
     
     bot.is_active = True
     bot.status = BotStatus.ACTIVE

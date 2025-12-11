@@ -11,6 +11,7 @@ packages = ["cargo", "libiconv", "libxcrypt", "postgresql", "rustc"]
 [userenv.development]
 DEBUG = "true"
 SECRET_KEY = "dev-secret-key-change-in-production"
+WEBHOOK_BASE_URL = "https://2fa61562-1211-4704-ae57-12e25911c70d-00-17dk22tfsmipj.pike.replit.dev"
 
 [workflows]
 runButton = "Project"
