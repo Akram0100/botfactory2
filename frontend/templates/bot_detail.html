@@ -1,9 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}{{ bot.name }} - BotFactory AI{% endblock %}
+{% block title %}{% if bot %}{{ bot.name }}{% else %}Bot topilmadi{% endif %} - BotFactory AI{% endblock %}
 
 {% block content %}
 <div class="container">
+    {% if bot %}
     <!-- Page Header -->
     <div class="flex justify-between items-center" style="margin-bottom: 2rem;">
         <div>
@@ -75,7 +76,7 @@
                 <div style="display: flex; flex-direction: column; gap: 0.75rem;">
                     <div style="display: flex; justify-content: space-between;">
                         <span style="color: var(--text-muted);">Platforma</span>
-                        <span>📱 {{ bot.platform.value | title }}</span>
+                        <span>📱 {{ bot.platform.value | title if bot.platform else 'Telegram' }}</span>
                     </div>
                     <div style="display: flex; justify-content: space-between;">
                         <span style="color: var(--text-muted);">Holat</span>
@@ -96,15 +97,15 @@
                 <div style="display: flex; flex-direction: column; gap: 0.75rem;">
                     <div style="display: flex; justify-content: space-between;">
                         <span style="color: var(--text-muted);">Jami xabarlar</span>
-                        <span style="font-weight: 600;">1,542</span>
+                        <span style="font-weight: 600;">{{ bot.total_messages or 0 }}</span>
                     </div>
                     <div style="display: flex; justify-content: space-between;">
                         <span style="color: var(--text-muted);">Foydalanuvchilar</span>
-                        <span style="font-weight: 600;">128</span>
+                        <span style="font-weight: 600;">{{ bot.total_users or 0 }}</span>
                     </div>
                     <div style="display: flex; justify-content: space-between;">
                         <span style="color: var(--text-muted);">Bilimlar</span>
-                        <span style="font-weight: 600;">45</span>
+                        <span style="font-weight: 600;">0</span>
                     </div>
                 </div>
             </div>
@@ -119,9 +120,22 @@
             </div>
         </div>
     </div>
+    {% else %}
+    <!-- Bot not found -->
+    <div class="empty-state">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <h3>Bot topilmadi</h3>
+        <p>Bu bot mavjud emas yoki sizga tegishli emas.</p>
+        <a href="/bots" class="btn btn-primary">Botlarimga qaytish</a>
+    </div>
+    {% endif %}
 </div>
 
 {% block extra_js %}
+{% if bot %}
 <script>
     document.getElementById('botSettingsForm').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -138,5 +152,6 @@
         }
     });
 </script>
+{% endif %}
 {% endblock %}
 {% endblock %}
